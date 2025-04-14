@@ -18,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@EnableAsync
 public class TestJobConfig {
 
     @Autowired
@@ -29,6 +28,8 @@ public class TestJobConfig {
         return new StepBuilder("TestStep", jobRepository)
             .tasklet((stepContribution, chunkContext) -> {
                 System.out.println("Step 진행 중!");
+
+                Thread.sleep(10000);
 
                 try(
                     Connection conn = jdbcConnectionProvider.getConnection();
