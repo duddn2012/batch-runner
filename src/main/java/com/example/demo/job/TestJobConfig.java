@@ -14,7 +14,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -24,12 +23,12 @@ public class TestJobConfig {
     private JdbcConnectionProvider jdbcConnectionProvider;
 
     @Bean
-    public Step TestStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
-        return new StepBuilder("TestStep", jobRepository)
+    public Step DbConnectionTestStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+        return new StepBuilder("DbConnectionTestStep", jobRepository)
             .tasklet((stepContribution, chunkContext) -> {
-                System.out.println("Step 진행 중!");
+                System.out.println("DbConnectionTestStep 진행 중!");
 
-                Thread.sleep(10000);
+                Thread.sleep(1000);
 
                 try(
                     Connection conn = jdbcConnectionProvider.getConnection();
@@ -46,6 +45,21 @@ public class TestJobConfig {
                     throw new RuntimeException("DB 조회 중 오류 발생", e);
                 }
 
+
+                System.out.println("DbConnectionTestStep 종료!");
+
+                return RepeatStatus.FINISHED;
+            }, platformTransactionManager).build();
+    }
+
+    @Bean
+    public Step FileTestStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+        return new StepBuilder("FileTestStep", jobRepository)
+            .tasklet((stepContribution, chunkContext) -> {
+                System.out.println("FileTestStep 진행 중!");
+
+                System.out.println("FileTestStep 종료!");
+
                 return RepeatStatus.FINISHED;
             }, platformTransactionManager).build();
     }
@@ -54,7 +68,8 @@ public class TestJobConfig {
     public Job TestJob(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
         return new JobBuilder("TestJob", jobRepository)
             .incrementer(new RunIdIncrementer())
-            .start(TestStep(jobRepository, platformTransactionManager))
+            .start(DbConnectionTestStep(jobRepository, platformTransactionManager))
+            .next(FileTestStep(jobRepository, platformTransactionManager))
             .build();
     }
 }
