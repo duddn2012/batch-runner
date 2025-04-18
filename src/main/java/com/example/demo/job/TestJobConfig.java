@@ -1,9 +1,13 @@
 package com.example.demo.job;
 
+import com.example.demo.common.util.FileWriteUtil;
 import com.example.demo.config.JdbcConnectionProvider;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -11,16 +15,16 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
+@RequiredArgsConstructor
 public class TestJobConfig {
 
-    @Autowired
-    private JdbcConnectionProvider jdbcConnectionProvider;
+    private final JdbcConnectionProvider jdbcConnectionProvider;
+    private final FileWriteUtil fileWriteUtil;
 
     @Bean
     public Step DbConnectionTestStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
@@ -57,6 +61,10 @@ public class TestJobConfig {
         return new StepBuilder("FileTestStep", jobRepository)
             .tasklet((stepContribution, chunkContext) -> {
                 System.out.println("FileTestStep 진행 중!");
+
+                Path path = Paths.get("logs", "app.txt");
+
+                fileWriteUtil.appendWriteLine(path, "test!!");
 
                 System.out.println("FileTestStep 종료!");
 
