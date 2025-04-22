@@ -20,7 +20,23 @@ class BatchJobRunnerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"TestJob"})
-    void executeJob(String jobBeanName) throws Exception {
-        batchJobRunner.executeJob(new String[]{jobBeanName});
+    void runSyncJob(String jobBeanName) throws Exception {
+
+        if(jobBeanName.isEmpty()) return;
+
+        String mode = "sync";
+
+        batchJobRunner.executeJob(new String[]{jobBeanName, mode});
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {""})
+    void runAsyncJob(String jobBeanName) throws Exception {
+
+        if(jobBeanName.isEmpty()) return;
+
+        String mode = "async";
+
+        batchJobRunner.executeJob(new String[]{jobBeanName, mode});
     }
 }

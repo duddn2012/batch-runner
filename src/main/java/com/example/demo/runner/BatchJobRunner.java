@@ -29,7 +29,8 @@ public class BatchJobRunner implements CommandLineRunner {
             return;
         }
 
-        String jobBeanName = "TestJob"; //args[0];
+        String jobBeanName = args[0];
+        String mode = args[1];
 
         Job job = context.getBean(jobBeanName, Job.class);
 
@@ -37,11 +38,13 @@ public class BatchJobRunner implements CommandLineRunner {
             .addLong("time", System.currentTimeMillis())
             .toJobParameters();
 
-        JobExecution jobExecution = jobLauncher.run(job, jobParameters);
-
-        System.out.println("Id : " + jobExecution.getJobInstance().getId());
-        System.out.println("Job Name : " + jobExecution.getJobInstance().getJobName());
-        System.out.println("Exit Status : " + jobExecution.getStatus());
+        if("sync".equalsIgnoreCase(mode)) {
+            jobLauncher.run(job, jobParameters);
+        } else {
+            // run async job
+            // TODO: jobLauncher 추상화 필요 @Async 기반 처리
+            //jobLauncher.run(job, jobParameters);
+        }
     }
 
     @Override
