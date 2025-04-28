@@ -30,7 +30,7 @@ public class TestJobConfig {
     public Step DbConnectionTestStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
         return new StepBuilder("DbConnectionTestStep", jobRepository)
             .tasklet((stepContribution, chunkContext) -> {
-                System.out.println("DbConnectionTestStep 진행 중!");
+                System.out.println("DbConnectionTestStep 진행 중!!!!");
 
                 Thread.sleep(1000);
 
