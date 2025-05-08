@@ -2,41 +2,39 @@ package com.example.demo.runner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.example.demo.support.JobContextInitializer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-@TestPropertySource(properties = "spring.main.web-application-type=none")
+@ContextConfiguration(initializers = JobContextInitializer.class)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 class BatchJobRunnerTest {
 
     @Autowired
     private BatchJobRunner batchJobRunner;
 
-    @ParameterizedTest
-    @ValueSource(strings = {"TestJob"})
-    void runSyncJob(String jobBeanName) throws Exception {
+    private static final String jobName = "TestJob";
 
-        if(jobBeanName.isEmpty()) return;
-
-        String mode = "sync";
-
-        batchJobRunner.executeJob(new String[]{jobBeanName, mode});
+    @BeforeAll
+    static void beforeAll() {
+        System.setProperty("job.name", jobName);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {""})
-    void runAsyncJob(String jobBeanName) throws Exception {
+    @Test
+    void runSyncJob() throws Exception {
+        String mode = "sync";
 
-        if(jobBeanName.isEmpty()) return;
-
-        String mode = "async";
-
-        batchJobRunner.executeJob(new String[]{jobBeanName, mode});
+        batchJobRunner.executeJob(new String[]{jobName, mode});
     }
 }

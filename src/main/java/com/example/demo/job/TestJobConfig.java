@@ -1,7 +1,8 @@
 package com.example.demo.job;
 
 import com.example.demo.common.util.FileWriteUtil;
-import com.example.demo.config.JdbcConnectionProvider;
+import com.example.demo.common.config.JdbcConnectionProvider;
+import com.example.demo.support.JobConfiguration;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -16,10 +17,9 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+@JobConfiguration(name = "TestJob")
 @RequiredArgsConstructor
 public class TestJobConfig {
 
